@@ -1,0 +1,1 @@
+This repository serves as a long-term reference for algorithmic problem solving in JavaScript. Solutions are implemented with an emphasis on correctness, time and space complexity, and reusable problem-solving patterns applicable to both technical interviews and real-world engineering.
