@@ -1,5 +1,101 @@
 console.clear();
 
+/* 
+  --- Pattern Identification ---
+  Primary Pattern: Linked List Traversal (Simulation)
+  Secondary Pattern: Elementary Math (carry handling)
+
+  Immediate recognition triggers
+  - “digits stored in reverse order
+  - “each node contains a single digit”
+  - “add the two numbers”
+  - output must also be a linked list
+
+  This is not DP, not recursion-heavy, not two pointers in the usual sense.
+  It is digit-by-digit simulation with carry.
+*/
+
+/* 
+  ---- Brute Force Approach ---
+  Idea
+  - Convert both linked lists to integers
+  - Add the integers
+  - Convert the sum back to a linked list
+
+  Why This Is Conceptually Brute Force
+  - You are ignoring the structure of the input and forcing a numeric conversion.
+
+  Pseudo-Implementation (Conceptual)
+  - Traverse l1, build number
+  - Traverse l2, build number
+  - Add them
+  - Convert result to linked list
+
+  Time: O(n + m)
+  Space: O(n + m)
+
+  Why It’s NOT acceptable
+  - Numbers can exceed safe integer range
+  - JavaScript cannot safely represent large integers here
+  - Interviewers explicitly expect list-based addition
+
+  This approach is usually mentioned briefly and discarded.
+*/
+
+/* 
+  ---- Optimized Approach — Digit-by-Digit Linked List Addition (Expected) ---
+  Core Insight
+  - This is exactly how manual addition works:
+    Add digits
+    Carry over when sum ≥ 10
+    Move to next node
+
+  The reversed order makes this easier, not harder.
+
+  Algorithm
+  - Create a dummy head node
+  - Maintain a carry
+  - Traverse both lists simultaneously
+  - At each step:
+    sum = val1 + val2 + carry
+    new digit = sum % 10
+    carry = Math.floor(sum / 10)
+  - Continue until:
+    both lists are exhausted
+    and carry is zero
+
+  Time: O(max(n, m))
+  Space: O(max(n, m))
+  (output list; auxiliary space is O(1))
+*/
+
+function ListNode(val, next = null) {
+  this.val = val;
+  this.next = next;
+}
+
+function addTwoNumbers(l1, l2) {
+  let dummy = new ListNode(0);
+  let current = dummy;
+  let carry = 0;
+
+  while (l1 !== null || l2 !== null || carry !== 0) {
+    const x = l1 ? l1.val : 0;
+    const y = l2 ? l2.val : 0;
+
+    const sum = x + y + carry;
+    carry = Math.floor(sum / 10);
+
+    current.next = new ListNode(sum % 10);
+    current = current.next;
+
+    if (l1) l1 = l1.next;
+    if (l2) l2 = l2.next;
+  }
+
+  return dummy.next;
+}
+
 /**
  * Definition for singly-linked list.
  * function ListNode(val, next) {
@@ -122,3 +218,11 @@ function printList(head) {
   }
   console.log(arr.join(" -> "));
 }
+
+/*
+  Key Interview Insight
+  - This problem is not about numbers.
+  - It is about simulating elementary addition while traversing two linked lists.
+
+  NB: “We avoid numeric conversion and instead propagate carry node by node”
+*/

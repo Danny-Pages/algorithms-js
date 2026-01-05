@@ -1,16 +1,86 @@
 console.clear();
 
-// Expand Around Center (Optimal Practical) --- O(n²) O(1)
-const longestPalindrome = function (s) {
-  if (s.length <= 1) return s;
+/* 
+  --- Pattern Identification ---
+  Primary Pattern: Expand Around Center
+  Secondary Pattern (conditional)
+  - Dynamic Programming
+  - Manacher’s Algorithm (advanced / niche)
 
-  let start = 0,
-    maxLen = 1;
+  Immediate recognition triggers
+  - “substring” (contiguous)
+  - “palindromic”
+  - max length constraint n ≤ 1000
 
-  function expandAroundCenter(left, right) {
+  This constraint is the key.
+  It allows O(n²), but not more.
+*/
+
+/* 
+  ---- Brute Force Approach ---
+  Idea: Generate all substrings and check if each is a palindrome.
+
+  Time: O(n³) (O(n²) substrings × O(n) palindrome check)
+  Space: O(1) (excluding substring creation)
+
+  Why it fails
+  - n = 1000
+  - 10⁹ operations worst case
+  - Clearly unacceptable
+*/
+
+function longestPalindrome(s) {
+  let longest = "";
+
+  function isPalindrome(str) {
+    let l = 0,
+      r = str.length - 1;
+    while (l < r) {
+      if (str[l++] !== str[r--]) return false;
+    }
+    return true;
+  }
+
+  for (let i = 0; i < s.length; i++) {
+    for (let j = i + 1; j <= s.length; j++) {
+      const substr = s.slice(i, j);
+      if (isPalindrome(substr) && substr.length > longest.length) {
+        longest = substr;
+      }
+    }
+  }
+
+  return longest;
+}
+
+/* 
+  ---- Optimized Approach #1 — Expand Around Center (Expected) ---
+  Core Insight 
+  - Every palindrome: Has a center, Expands symmetrically
+  - There are only: n odd-length centers, n - 1 even-length centers
+  - Total centers = 2n - 1
+
+  Algorithm
+  - For each index i:
+    - Expand for odd-length palindromes (i, i)
+    - Expand for even-length palindromes (i, i + 1)
+  - Track the longest substring found
+
+  Time: O(n²)
+  Space: O(1)
+*/
+
+function longestPalindrome(s) {
+  if (s.length < 2) return s;
+
+  let start = 0;
+  let maxLen = 1;
+
+  function expand(left, right) {
     while (left >= 0 && right < s.length && s[left] === s[right]) {
-      if (right - left + 1 > maxLen) {
-        maxLen = right - left + 1;
+      const len = right - left + 1;
+      if (len > maxLen) {
+        maxLen = len;
         start = left;
       }
       left--;
@@ -19,44 +89,65 @@ const longestPalindrome = function (s) {
   }
 
   for (let i = 0; i < s.length; i++) {
-    expandAroundCenter(i, i); // Odd length
-    expandAroundCenter(i, i + 1); // Even length
+    expand(i, i); // odd length
+    expand(i, i + 1); // even length
   }
 
   return s.substring(start, start + maxLen);
-};
+}
 
-// Dynamic Programming --- O(n²) O(n²)
-const longestPalindrome2 = function (s) {
-  let n = s.length;
-  if (n <= 1) return s;
+/* 
+  ---- Optimized Approach #2 — Dynamic Programming ---
+  Idea 
+  - Use a DP table where: dp[i][j] = true if s[i..j] is a palindrome
 
-  let dp = Array.from({ length: n }, () => Array(n).fill(false));
-  let start = 0,
-    maxLen = 1;
+  Transition:
+  - Characters match
+  - Inner substring is palindrome
 
-  for (let i = 0; i < n; i++) dp[i][i] = true; // single char
+  Time: O(n²)
+  Space: O(n²)
+*/
+
+function longestPalindrome(s) {
+  const n = s.length;
+  const dp = Array.from({ length: n }, () => Array(n).fill(false));
+
+  let start = 0;
+  let maxLen = 1;
+
+  for (let i = 0; i < n; i++) dp[i][i] = true;
 
   for (let len = 2; len <= n; len++) {
     for (let i = 0; i <= n - len; i++) {
-      let j = i + len - 1;
-      if (s[i] === s[j]) {
-        if (len === 2 || dp[i + 1][j - 1]) {
-          dp[i][j] = true;
-          if (len > maxLen) {
-            start = i;
-            maxLen = len;
-          }
+      const j = i + len - 1;
+
+      if (s[i] === s[j] && (len === 2 || dp[i + 1][j - 1])) {
+        dp[i][j] = true;
+
+        if (len > maxLen) {
+          start = i;
+          maxLen = len;
         }
       }
     }
   }
 
   return s.substring(start, start + maxLen);
-};
+}
 
-// Manacher’s Algorithm (Optimal O(n)) --- O(n) O(n)
-const longestPalindrome3 = function (s) {
+/* 
+  ---- Optimized Approach #3 — Manacher’s Algorithm (Advanced) ---
+  Very complex
+  Almost never expected unless explicitly asked
+
+  Mentioning it shows depth, not required to implement.
+
+  Time: O(n)
+  Space: O(n)
+*/
+
+function longestPalindrome(s) {
   if (s.length === 0) return "";
 
   // Transform: add separators (#) to handle even length
@@ -85,8 +176,6 @@ const longestPalindrome3 = function (s) {
     }
   }
 
-  console.log(p);
-
   // Find longest palindrome
   let maxLen = 0,
     centerIndex = 0;
@@ -99,9 +188,14 @@ const longestPalindrome3 = function (s) {
 
   let start = (centerIndex - maxLen) / 2;
   return s.substring(start, start + maxLen);
-};
+}
 
-console.log(longestPalindrome3("babad")); // "bab" or "aba"
-// console.log(longestPalindrome("cbbd"));  // "bb"
-// console.log(longestPalindrome("a"));     // "a"
-// console.log(longestPalindrome("ac"));    // "a" or "c"
+console.log(longestPalindrome("babad")); // "bab" or "aba"
+console.log(longestPalindrome("cbbd")); // "bb"
+console.log(longestPalindrome("a")); // "a"
+console.log(longestPalindrome("ac")); // "a" or "c"
+
+/*
+  Key Interview Insight
+  - A palindrome is defined by its center, not its endpoints — expanding from each center avoids redundant checks.
+*/

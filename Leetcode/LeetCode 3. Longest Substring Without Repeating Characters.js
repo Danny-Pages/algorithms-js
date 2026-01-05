@@ -1,36 +1,83 @@
 console.clear();
 
-// Brute Force (Check All Substrings) --- O(n³) O(n)
-function lengthOfLongestSubstringBrute(s) {
+/* 
+  --- Pattern Identification ---
+  Primary Pattern: Sliding Window (Dynamic / Variable Size)
+  Secondary Pattern: Hash Set / Hash Map for frequency or last-seen index
+
+  Immediate recognition triggers
+  - “substring” (contiguous)
+  - “without repeating”
+  - “longest”
+  - large input size (s.length ≤ 5 * 10⁴)
+
+  This cannot be brute-forced beyond O(n²) and pass.
+*/
+
+/* 
+  ---- Brute Force Approach ---
+  Idea: Check every possible substring and verify if it contains all unique characters.
+
+  Algorithm
+  - Generate all substrings
+  - For each substring, check if all characters are unique (using a set)
+
+  Time: O(n²) (worst case: all unique characters)
+  Space: O(min(n, charset))
+
+  Why it fails
+  - n = 50,000
+  - n² = 2.5 * 10⁹ operations → impossible
+  - This forces a linear-time solution
+*/
+
+function lengthOfLongestSubstring(s) {
   let maxLen = 0;
 
-  function allUnique(str) {
-    let set = new Set(str);
-    return set.size === str.length;
-  }
-
   for (let i = 0; i < s.length; i++) {
-    for (let j = i + 1; j <= s.length; j++) {
-      if (allUnique(s.slice(i, j))) {
-        maxLen = Math.max(maxLen, j - i);
-      }
+    const set = new Set();
+    for (let j = i; j < s.length; j++) {
+      if (set.has(s[j])) break;
+      set.add(s[j]);
+      maxLen = Math.max(maxLen, j - i + 1);
     }
   }
 
   return maxLen;
 }
 
-// Sliding Window with Set (Efficient) --- O(n) O(min(n, charset)) (at most 128–256 for ASCII/Unicode subset)
-function lengthOfLongestSubstringSet(s) {
-  let set = new Set();
-  let left = 0,
-    maxLen = 0;
+/* 
+  ---- Optimized Approach #1 — Sliding Window + Hash Set (Most Intuitive) ---
+  Core Insight
+    - Maintain a window where:
+      All characters are unique
+      Expand right pointer
+      Shrink left pointer only when duplicates appear
+
+  Algorithm
+  - Use two pointers: left, right
+  - Use a Set to track current window characters
+  - Move right forward
+  - If duplicate: Remove characters from left until duplicate is gone
+  - Track max window size
+
+  Time: O(n)
+  Space: O(min(n, charset))
+
+  Why this works: Each character enters and leaves the set at most once.
+*/
+
+function lengthOfLongestSubstring(s) {
+  let left = 0;
+  let maxLen = 0;
+  const set = new Set();
 
   for (let right = 0; right < s.length; right++) {
     while (set.has(s[right])) {
       set.delete(s[left]);
       left++;
     }
+
     set.add(s[right]);
     maxLen = Math.max(maxLen, right - left + 1);
   }
@@ -38,29 +85,54 @@ function lengthOfLongestSubstringSet(s) {
   return maxLen;
 }
 
-// Sliding Window with Map (Index Tracking) --- O(n) O(min(n, charset))
-// Best in practice – avoids unnecessary deletions.
-function lengthOfLongestSubstringMap(s) {
-  let map = new Map(); // char -> last index
-  let left = 0,
-    maxLen = 0;
+/* 
+  ---- Optimized Approach #2 — Sliding Window + Hash Map (Last Seen Index) ---
+  Core Insight : Instead of shrinking one step at a time, jump the left pointer 
+  past the last occurrence of a duplicate.
+
+  Algorithm
+  - Maintain a map: char → lastIndex
+  - If current character was seen inside current window: Move left to lastIndex + 1
+  - Update max length
+
+  Time: O(n)
+  Space: O(min(n, charset))
+*/
+
+function lengthOfLongestSubstring(s) {
+  let left = 0;
+  let maxLen = 0;
+  const map = new Map();
 
   for (let right = 0; right < s.length; right++) {
-    if (map.has(s[right]) && map.get(s[right]) >= left) {
-      left = map.get(s[right]) + 1;
+    const char = s[right];
+
+    if (map.has(char) && map.get(char) >= left) {
+      left = map.get(char) + 1;
     }
-    map.set(s[right], right);
+
+    map.set(char, right);
     maxLen = Math.max(maxLen, right - left + 1);
   }
 
   return maxLen;
 }
 
-console.log(lengthOfLongestSubstringBrute("abcabcbb")); // 3
-console.log(lengthOfLongestSubstringSet("bbbbb")); // 1
-console.log(lengthOfLongestSubstringMap("pwwkew")); // 3
-console.log(lengthOfLongestSubstringMap("")); // 0
-console.log(lengthOfLongestSubstringMap("dvdf")); // 3
+console.log(lengthOfLongestSubstring("abcabcbb")); // 3
+console.log(lengthOfLongestSubstring("bbbbb")); // 1
+console.log(lengthOfLongestSubstring("pwwkew")); // 3
+console.log(lengthOfLongestSubstring("")); // 0
+console.log(lengthOfLongestSubstring("dvdf")); // 3
+
+/* 
+  Trade-off vs Set-based approach
+
+  Set Version	              Map Version
+  
+  Easier to explain	        More optimal jumps
+  Shrinks step-by-step	    Shrinks in one move
+  Slightly slower	          Preferred in interviews
+*/
 
 // Extra
 // Actually return the longest substring itself, not just its length.
@@ -114,3 +186,9 @@ console.log(longestSubstringSet("abcabcbb")); // "abc"
 console.log(longestSubstringSet("bbbbb")); // "b"
 console.log(longestSubstringMap("pwwkew")); // "wke"
 console.log(longestSubstringMap("dvdf")); // "vdf"
+
+/*
+  Key Interview Insight
+  - This problem is a sliding window because we are optimizing a contiguous range 
+    under a dynamic constraint (no duplicates).
+*/
