@@ -14,7 +14,7 @@ console.clear();
 */
 
 /* 
-  ---- Brute Force Approach ---
+  ---- Brute Force Approach ----
   Idea: Merge the two arrays into one sorted array, then compute the median.
 
   Time: O(m + n)
@@ -45,7 +45,7 @@ function findMedianSortedArrays(nums1, nums2) {
 }
 
 /* 
-  ---- Optimized Approach — Binary Search on Partition (Expected) ---
+  ---- Optimized Approach — Binary Search on Partition (Expected) ----
   Core Insight
     - You do not need the full merged array.
     - You only need to split both arrays into left and right halves such that:
@@ -56,6 +56,34 @@ function findMedianSortedArrays(nums1, nums2) {
 
   Time: O(log(min(m, n)))
   Space: O(1)
+*/
+
+/* 
+  Explanation with this examples (Better understanding)
+
+  “Partition both arrays with a knife cut so the left side has half the elements.
+  Only four border values matter.
+  If maxLeftX ≤ minRightY and maxLeftY ≤ minRightX, the cut is correct.
+  The median is then taken from the border values.”
+
+  odd                                         even
+  [1, 3], [2, 5, 8]                           [1,2] [3, 4]
+
+  1 | 3                                       1 | 2
+  2 5 | 8                                     3 | 4
+
+  L - [1, 2, 5]                               L - [1, 3]
+  R - [3, 8]                                  R - [2, 4]
+
+  1 3 | Infinity                              1 2 | Infinity
+  2 | 5 8                                     -Infinity | 3 4
+
+  L - [1, 2, 3]                               L - [1, 2]
+  R - [5, 8]                                  R - [3, 4]
+
+  Median = 3 (last number on L)               Median = 2.5 ((last number on L + first number on R) / 2) ((2+3)/2)
+
+  NB: Once the cut is correct, the median is obvious.
 */
 
 const findMedianSortedArrays = (nums1, nums2) => {
@@ -95,7 +123,7 @@ const findMedianSortedArrays = (nums1, nums2) => {
 };
 
 // Two-Pointer Walk (Without Extra Space) --- O(m+n) O(1)
-const findMedianSortedArrays3 = function (nums1, nums2) {
+const findMedianSortedArrays = function (nums1, nums2) {
   let total = nums1.length + nums2.length;
   let mid1 = Math.floor((total - 1) / 2);
   let mid2 = Math.floor(total / 2);
@@ -119,7 +147,7 @@ const findMedianSortedArrays3 = function (nums1, nums2) {
   return total % 2 === 0 ? (prev + curr) / 2 : curr;
 };
 
-console.log(findMedianSortedArrays([1, 3], [2, 5, 8])); // 2
+console.log(findMedianSortedArrays([1, 3], [2, 5, 8])); // 3
 console.log(findMedianSortedArrays([1, 2], [3, 4])); // 2.5
 console.log(findMedianSortedArrays([0, 0], [0, 0])); // 0
 console.log(findMedianSortedArrays([], [1])); // 1

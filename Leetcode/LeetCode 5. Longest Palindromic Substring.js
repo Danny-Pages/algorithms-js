@@ -17,7 +17,7 @@ console.clear();
 */
 
 /* 
-  ---- Brute Force Approach ---
+  ---- Brute Force Approach ----
   Idea: Generate all substrings and check if each is a palindrome.
 
   Time: O(n³) (O(n²) substrings × O(n) palindrome check)
@@ -54,7 +54,7 @@ function longestPalindrome(s) {
 }
 
 /* 
-  ---- Optimized Approach #1 — Expand Around Center (Expected) ---
+  ---- Optimized Approach #1 — Expand Around Center (Expected) ----
   Core Insight 
   - Every palindrome: Has a center, Expands symmetrically
   - There are only: n odd-length centers, n - 1 even-length centers
@@ -68,6 +68,67 @@ function longestPalindrome(s) {
 
   Time: O(n²)
   Space: O(1)
+*/
+
+/*
+  If you blank out, do this:
+
+  Say:
+  “Every palindrome expands from a center”
+
+  Ask:
+  “How many centers?” → 2 per index (2n - 1 possible centers) 
+
+  Write:
+  - expand(i, i)          odd length
+  - expand(i, i + 1)     even length
+
+  Inside expand:
+  - bounds
+  - equality
+  - update best
+  - expand pointers
+
+  You will reconstruct the exact solution.
+*/
+
+/* 
+  Explanation with this example (Better understanding)
+
+  "babad" -> length 5
+
+  2(5) - 1 = 9 centers
+
+  start = 0
+  maxLen = 1
+
+  i = 0
+    expand(0, 0) -> b (valid) (length 1) -> (out of bounds) ❌
+
+    expand(0, 1) -> b | a ❌ (not equal) 
+
+  i = 1
+    expand(1, 1) -> a (valid) (length 1) -> valid palindrome "bab" (length 3) -> (out of bounds) ❌
+
+    expand(1, 2) -> a | b ❌ (not equal) 
+
+  i = 2
+    expand(2, 2) -> b (valid) (length 1) -> valid palindrome "aba" (length 3) -> (out of bounds) ❌
+
+    expand(2, 3) -> b | a ❌ (not equal) 
+
+  i = 3
+    expand(3, 3) -> a (valid) (length 1) -> b a d (invalid palindrome) ❌ 
+
+    expand(3, 4) -> a | d ❌ (not equal) 
+
+  i = 4
+    expand(4, 4) -> d (valid) (length 1) -> (out of bounds) ❌
+    Only single character palindrome "d".
+
+  start = 0
+  maxLen = 3
+  s.substring(start, start + maxLen) = s.substring(0, 3) → "bab"
 */
 
 function longestPalindrome(s) {
@@ -97,7 +158,7 @@ function longestPalindrome(s) {
 }
 
 /* 
-  ---- Optimized Approach #2 — Dynamic Programming ---
+  ---- Optimized Approach #2 — Dynamic Programming ----
   Idea 
   - Use a DP table where: dp[i][j] = true if s[i..j] is a palindrome
 
@@ -137,7 +198,7 @@ function longestPalindrome(s) {
 }
 
 /* 
-  ---- Optimized Approach #3 — Manacher’s Algorithm (Advanced) ---
+  ---- Optimized Approach #3 — Manacher’s Algorithm (Advanced) ----
   Very complex
   Almost never expected unless explicitly asked
 
@@ -194,6 +255,22 @@ console.log(longestPalindrome("babad")); // "bab" or "aba"
 console.log(longestPalindrome("cbbd")); // "bb"
 console.log(longestPalindrome("a")); // "a"
 console.log(longestPalindrome("ac")); // "a" or "c"
+
+/*
+  Motion Summary
+
+  EXPAND AROUND CENTER: - Pointer Ripple Animation
+  center → expand → collapse → next center
+  (center-by-center ripples)
+
+  DP: - Grid Fill Animation
+  small → bigger → bigger → bigger
+  (truth propagation)
+
+  MANACHER: — Sliding Window + Mirror Animation
+  reuse → reuse → reuse → expand → reuse
+  (sliding symmetry window)
+*/
 
 /*
   Key Interview Insight

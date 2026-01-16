@@ -16,7 +16,7 @@ console.clear();
 */
 
 /* 
-  ---- Brute Force Approach ---
+  ---- Brute Force Approach ----
   Idea
   - Convert both linked lists to integers
   - Add the integers
@@ -43,7 +43,7 @@ console.clear();
 */
 
 /* 
-  ---- Optimized Approach — Digit-by-Digit Linked List Addition (Expected) ---
+  ---- Optimized Approach — Digit-by-Digit Linked List Addition (Expected) ----
   Core Insight
   - This is exactly how manual addition works:
     Add digits

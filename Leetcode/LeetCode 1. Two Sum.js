@@ -15,7 +15,7 @@ console.clear();
 */
 
 /* 
-  ---- Brute Force Approach ---
+  ---- Brute Force Approach ----
   Idea: Check every pair of indices (i, j) and see if nums[i] + nums[j] === target.
   
   Algorithm: Two nested loops (Ensure i !== j)
@@ -37,7 +37,7 @@ function twoSum(nums, target) {
 }
 
 /* 
-  ---- Optimized Approach #1 — Hash Map (Expected Solution) ---
+  ---- Optimized Approach #1 — Hash Map (Expected Solution) ----
   Core Insight: Instead of checking all pairs, remember what you’ve already seen and look for the complement.
 
   For each number x, you need: (target - x)
@@ -78,7 +78,7 @@ function twoSum(nums, target) {
 }
 
 /* 
-  ---- Optimized Approach #2 — Sorting + Two Pointers (Conditional) ---
+  ---- Optimized Approach #2 — Sorting + Two Pointers (Conditional) ----
   This is not acceptable unless:
   - Sorting is explicitly allowed
   - Or indices are not required

@@ -1,6 +1,76 @@
 console.clear();
 
-// Iterative Parsing (Optimal & Clean) --- O(n) O(1)
+/* 
+  --- Pattern Identification ---
+  Primary Pattern: String Parsing / Finite State Machine
+  Secondary Pattern (conditional): Math + Overflow Handling
+
+  Immediate recognition triggers
+  - “ignore whitespace”
+  - “optional sign”
+  - “stop at first non-digit”
+  - “clamp to 32-bit range”
+
+  This is not regex, not DP, not greedy.
+  It is a step-by-step parser.
+*/
+
+/* 
+  ---- Brute Force Approach ----
+  Idea
+  - Trim string
+  - Use parseInt
+  - Clamp result
+
+  Time: O(n)
+  Space: O(1)
+
+  Why this is not acceptable
+  - Violates the spirit of the problem
+  - Ignores step-by-step rules
+  - Fails edge cases in strict interview environments
+  - This solution gets rejected in serious interviews.
+*/
+
+function myAtoi(s) {
+  const num = parseInt(s, 10);
+  if (isNaN(num)) return 0;
+
+  const INT_MAX = 2 ** 31 - 1;
+  const INT_MIN = -(2 ** 31);
+
+  return Math.min(Math.max(num, INT_MIN), INT_MAX);
+}
+
+/* 
+  ---- Optimized Approach #1 — Manual Parsing (Expected) ----
+  Core Insight 
+  - This problem is a controlled character stream:
+    - Skip whitespace
+    - Read sign
+    - Read digits
+    - Stop early
+    - Clamp on overflow
+
+  You must build the number digit by digit.
+
+  Overflow Rule (Critical)
+  - Before doing: num = num * 10 + digit
+  - Check: num > (INT_MAX - digit) / 10
+  
+  This prevents overflow before it happens.
+
+  Time: O(n)
+  Space: O(1)
+
+  Why This Is the Correct Mental Model
+  - This problem is not about converting strings.
+  - It is about building a deterministic parser that:
+    - follows strict rules
+    - stops early
+    - defends against overflow
+*/
+
 const myAtoi = function (s) {
   const INT_MAX = 2 ** 31 - 1;
   const INT_MIN = -(2 ** 31);
@@ -13,7 +83,7 @@ const myAtoi = function (s) {
   while (i < s.length && s[i] === " ") i++;
 
   // 2️⃣ Check for sign
-  if (s[i] === "+" || s[i] === "-") {
+  if ((i < s.length && s[i] === "+") || s[i] === "-") {
     sign = s[i] === "-" ? -1 : 1;
     i++;
   }
@@ -38,7 +108,7 @@ const myAtoi = function (s) {
 };
 
 // Using Regular Expressions (Concise but less educational) --- O(n) O(1)
-const myAtoi2 = function (s) {
+const myAtoi = function (s) {
   const INT_MAX = 2 ** 31 - 1;
   const INT_MIN = -(2 ** 31);
 
@@ -54,7 +124,7 @@ const myAtoi2 = function (s) {
 };
 
 // Manual Character Code Handling (For deeper control) --- O(n) O(1)
-const myAtoi3 = function (s) {
+const myAtoi = function (s) {
   const INT_MAX = 2147483647;
   const INT_MIN = -2147483648;
 
@@ -92,9 +162,15 @@ const myAtoi3 = function (s) {
   return res * sign;
 };
 
+/*
+  Key Interview Insight
+  - Treat the input as a character stream and move through clearly defined states: 
+    whitespace → sign → digits → stop.
+*/
+
 console.log(myAtoi("42")); // 42
-console.log(myAtoi2("   -042")); // -42
-console.log(myAtoi3("1337c0d3")); // 1337
+console.log(myAtoi("   -042")); // -42
+console.log(myAtoi("1337c0d3")); // 1337
 console.log(myAtoi("0-1")); // 0
-console.log(myAtoi2("words and 987")); // 0
-console.log(myAtoi3("91283472332")); // 2147483647 (overflow)
+console.log(myAtoi("words and 987")); // 0
+console.log(myAtoi("91283472332")); // 2147483647 (overflow)

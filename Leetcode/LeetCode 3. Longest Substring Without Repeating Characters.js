@@ -15,7 +15,7 @@ console.clear();
 */
 
 /* 
-  ---- Brute Force Approach ---
+  ---- Brute Force Approach ----
   Idea: Check every possible substring and verify if it contains all unique characters.
 
   Algorithm
@@ -47,7 +47,7 @@ function lengthOfLongestSubstring(s) {
 }
 
 /* 
-  ---- Optimized Approach #1 — Sliding Window + Hash Set (Most Intuitive) ---
+  ---- Optimized Approach #1 — Sliding Window + Hash Set (Most Intuitive) ----
   Core Insight
     - Maintain a window where:
       All characters are unique
@@ -86,7 +86,7 @@ function lengthOfLongestSubstring(s) {
 }
 
 /* 
-  ---- Optimized Approach #2 — Sliding Window + Hash Map (Last Seen Index) ---
+  ---- Optimized Approach #2 — Sliding Window + Hash Map (Last Seen Index) ----
   Core Insight : Instead of shrinking one step at a time, jump the left pointer 
   past the last occurrence of a duplicate.
 
@@ -125,7 +125,7 @@ console.log(lengthOfLongestSubstring("")); // 0
 console.log(lengthOfLongestSubstring("dvdf")); // 3
 
 /* 
-  Trade-off vs Set-based approach
+  Trade-off
 
   Set Version	              Map Version
   
